@@ -151,13 +151,22 @@ export default function LearningArea() {
     const localCustomTopicsStr = localStorage.getItem("custom_topics");
     const localCustomTopics: Topic[] = localCustomTopicsStr ? JSON.parse(localCustomTopicsStr) : [];
 
-    // Merge: built-in topics first, then local custom topics, then any DB topics that aren't already present
+    // Merge: built-in topics first, then deduplicated custom/DB topics
+    const builtInSlugs = new Set(localTopics.map((t) => t.slug));
+    const builtInNames = new Set(localTopics.map((t) => t.name.toLowerCase()));
+
     const dbTopics = (dbTopicData as Topic[] | null) ?? [];
-    const allTopics = [
-      ...localTopics,
-      ...localCustomTopics,
-      ...dbTopics.filter((dt) => !topicMap.has(dt.slug) && !localCustomTopics.some(lt => lt.slug === dt.slug)),
-    ];
+    const filteredCustomTopics = localCustomTopics.filter(
+      (lt) => !builtInSlugs.has(lt.slug) && !builtInNames.has(lt.name.toLowerCase())
+    );
+    const filteredDbTopics = dbTopics.filter(
+      (dt) =>
+        !builtInSlugs.has(dt.slug) &&
+        !builtInNames.has(dt.name.toLowerCase()) &&
+        !filteredCustomTopics.some((lt) => lt.slug === dt.slug)
+    );
+
+    const allTopics = [...localTopics, ...filteredCustomTopics, ...filteredDbTopics];
 
     setTopics(allTopics);
     setProgress((progData as UserProgress[] | null) ?? []);
