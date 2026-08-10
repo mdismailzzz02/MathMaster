@@ -10,5 +10,8 @@ services:
         value: no-cache
     routes:
       - type: rewrite
+        source: /assets/*
+        destination: /assets/*
+      - type: rewrite
         source: /*
         destination: /index.html
