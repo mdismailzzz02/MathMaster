@@ -10,6 +10,10 @@ Built for the **AI Factory — Native.builder Hackathon** (lablab.ai × Natively
   <img src="https://img.shields.io/badge/🚀_Live_Demo-mathmaster--qvr6.onrender.com-4A7CF7?style=for-the-badge&labelColor=1a1a1a" alt="Live Demo" />
 </a>
 
+<br/>
+
+<sub><i>Unpolished original native.builder deployment: <a href="#">[ ]</a></i></sub>
+
 <br/><br/>
 
 [![Built with native.builder](https://img.shields.io/badge/Built_with-native.builder-6366F1?style=flat-square)](https://lablab.ai/ai-hackathons/nativebuilder-build-without-limits)
@@ -131,6 +135,7 @@ npm run dev
 - **Built primarily with**: native.builder
 - **Finishing touches / AI-assisted coding**: VS Code
 - **Live app**: [mathmaster-qvr6.onrender.com](https://mathmaster-qvr6.onrender.com/)
+- **native.builder unpolished/original deployment**: see link at top of README
 
 ---
 
