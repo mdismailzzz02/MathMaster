@@ -135,24 +135,8 @@ export function generateQuestions(
       const q = gen(seed + i * 137, i);
       allQuestions.push({ ...q, type: "mcq", subtopic: subtopicSlug } as MCQQuestion);
     }
-  } else {
-    // Generic fallback for custom topics
-    for (let i = 0; i < count; i++) {
-      allQuestions.push({
-        type: "mcq",
-        id: i + 1,
-        subtopic: subtopicSlug,
-        question: `Solve this problem related to **${subtopicSlug.replace(/-/g, ' ')}**.`,
-        options: ["Correct Answer", "Incorrect A", "Incorrect B", "Incorrect C"],
-        correctIndex: 0,
-        explanation: "This is a placeholder question for a custom AI-generated topic.",
-        difficulty: depth === "core" ? "easy" : depth === "intermediate" ? "medium" : "hard",
-        topic: "Custom Topic"
-      });
-    }
-  }
 
-    // Inject ordering/matching based on seed
+    // Inject ordering/matching based on seed (ONLY for built-in topics)
     // (We replace up to 2 MCQs with a matching and ordering question if count >= 3)
     if (count >= 3) {
       // Add 1 matching
@@ -163,15 +147,33 @@ export function generateQuestions(
       }
 
       // Add 1 ordering
-      const orderingSet = getOrderingQuestions(subtopicSlug, depth, seed, 800);
+      const orderingSet = getOrderingQuestions(subtopicSlug, depth, seed, 901);
       if (orderingSet.length > 0) {
-        let insertIdx2 = Math.floor(mulberry32(seed + 2)() * count);
-        while (allQuestions[insertIdx2].type !== "mcq") {
-          insertIdx2 = (insertIdx2 + 1) % count;
+        let insertIdx = Math.floor(mulberry32(seed + 2)() * count);
+        // avoid overwriting the matching question
+        if (allQuestions[insertIdx].type === "matching") {
+           insertIdx = (insertIdx + 1) % count;
         }
-        allQuestions[insertIdx2] = orderingSet[0];
+        allQuestions[insertIdx] = orderingSet[0];
       }
     }
+  } else {
+    // Generic fallback for custom topics (Mastery Test needs these so it doesn't crash on custom topics)
+    for (let i = 0; i < count; i++) {
+      allQuestions.push({
+        type: "mcq",
+        id: i + 1,
+        subtopic: subtopicSlug,
+        question: `Solve this problem related to **${subtopicSlug.replace(/-/g, ' ')}**.`,
+        options: ["Correct Answer", "Incorrect A", "Incorrect B", "Incorrect C"],
+        correctIndex: 0,
+        explanation: "This is a placeholder question for a custom AI-generated topic.",
+        difficulty: depth === "core" ? "easy" : depth === "intermediate" ? "medium" : "hard",
+        topic: "Custom Topic",
+        isMock: true // Flag so QuizPage can override this with real AI generation
+      } as any);
+    }
+  }
 
   // Reassign sequential IDs
   return allQuestions.map((q, i) => ({ ...q, id: i + 1 }));

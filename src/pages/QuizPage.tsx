@@ -89,9 +89,13 @@ export default function QuizPage() {
       const topicHumanName = topicName || slugToName(topicSlug);
 
       // 1. Try static question bank first
-      let qs: QuizQuestion[] = [];
+      let qs: any[] = [];
       try {
         qs = generateQuestions(subtopicSlug, difficulty, count, seed);
+        // If the generator returned our mock placeholders (used by Mastery Test), discard them so we use AI
+        if (qs.length > 0 && qs[0].isMock) {
+          qs = [];
+        }
       } catch { /* ignore, fall through to Groq */ }
 
       // 2. Groq fallback when no static questions exist
