@@ -1,0 +1,95 @@
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&family=Comic+Neue:ital,wght@0,300;0,400;0,700;1,400&display=swap');
+@import "katex/dist/katex.min.css";
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Comic Neue", ui-sans-serif, system-ui, sans-serif;
+  --font-heading: "Baloo 2", ui-sans-serif, system-ui, sans-serif;
+
+  /* Design system palette */
+  --color-primary: oklch(0.5106 0.2301 276.97);
+  --color-on-primary: oklch(1 0 0);
+  --color-secondary: oklch(0.6801 0.1583 276.93);
+  --color-accent: oklch(0.6461 0.1943 41.12);
+  --color-background: oklch(0.9619 0.0179 272.31);
+  --color-foreground: oklch(0.2573 0.0861 281.29);
+  --color-muted: oklch(0.9497 0.0138 272.69);
+  --color-border: oklch(0.8699 0.0622 274.04);
+  --color-destructive: oklch(0.5771 0.2152 27.33);
+  --color-ring: oklch(0.5106 0.2301 276.97);
+  --color-card: oklch(1 0 0); /* white */
+
+  /* Subject colors */
+  --color-algo1: #4A7CF7;
+  --color-geo: #22C55E;
+  --color-algo2: #A855F7;
+  --color-calc: #F59E0B;
+  --color-xp: #FFD700;
+  --color-streak: #FF4500;
+}
+
+:root {
+  /* Plain CSS vars for dynamic use (e.g. style={{ color: `var(--clr-...)` }}) */
+  --clr-algo1: #4A7CF7;
+  --clr-geo: #22C55E;
+  --clr-algo2: #A855F7;
+  --clr-calc: #F59E0B;
+  --clr-xp: #FFD700;
+  --clr-streak: #FF4500;
+}
+
+/* Dawn Dark Mode */
+.dark {
+  --color-background: oklch(0.16 0.03 275); /* Deep dawn purple */
+  --color-foreground: oklch(0.96 0.01 272); /* Light text */
+  --color-muted: oklch(0.22 0.05 275); /* Slightly lighter dawn */
+  --color-border: oklch(0.28 0.05 275);
+  --color-card: oklch(0.20 0.04 275); /* Card background */
+  --color-primary: oklch(0.65 0.25 276.97); /* Brighter primary for contrast */
+}
+
+/* Base */
+body {
+  min-height: 100vh;
+  @apply bg-background text-foreground;
+}
+
+/* Component utilities */
+@layer components {
+  .card {
+    @apply bg-card rounded-2xl shadow-sm border border-border;
+  }
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl font-heading font-semibold px-5 py-2.5
+           bg-primary text-on-primary hover:brightness-110 active:scale-[0.97]
+           transition-all duration-150 ease-out cursor-pointer select-none
+           disabled:opacity-50 disabled:pointer-events-none;
+  }
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl font-heading font-semibold px-5 py-2.5
+           bg-transparent text-primary border-2 border-primary hover:bg-primary/5 active:scale-[0.97]
+           transition-all duration-150 ease-out cursor-pointer select-none;
+  }
+  .input-base {
+    @apply w-full px-4 py-2.5 rounded-xl border border-border bg-card text-foreground text-sm
+           placeholder:text-foreground/30
+           focus:outline-none focus:ring-2 focus:ring-ring/40 focus:border-ring
+           transition-all duration-150;
+  }
+}
+
+/* Focus-visible ring */
+*:focus-visible {
+  @apply outline-none ring-2 ring-ring/60;
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
