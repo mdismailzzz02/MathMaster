@@ -151,22 +151,43 @@ export default function LearningArea() {
     const localCustomTopicsStr = localStorage.getItem("custom_topics");
     const localCustomTopics: Topic[] = localCustomTopicsStr ? JSON.parse(localCustomTopicsStr) : [];
 
-    // Merge: built-in topics first, then deduplicated custom/DB topics
-    const builtInSlugs = new Set(localTopics.map((t) => t.slug));
-    const builtInNames = new Set(localTopics.map((t) => t.name.toLowerCase()));
-
+    // Merge and rigorously deduplicate all topics
     const dbTopics = (dbTopicData as Topic[] | null) ?? [];
-    const filteredCustomTopics = localCustomTopics.filter(
-      (lt) => !builtInSlugs.has(lt.slug) && !builtInNames.has(lt.name.toLowerCase())
-    );
-    const filteredDbTopics = dbTopics.filter(
-      (dt) =>
-        !builtInSlugs.has(dt.slug) &&
-        !builtInNames.has(dt.name.toLowerCase()) &&
-        !filteredCustomTopics.some((lt) => lt.slug === dt.slug)
-    );
+    
+    const seenSlugs = new Set<string>();
+    const seenNames = new Set<string>();
+    const finalTopics: Topic[] = [];
 
-    const allTopics = [...localTopics, ...filteredCustomTopics, ...filteredDbTopics];
+    // Helper to add a topic if unique
+    const tryAddTopic = (topic: Topic) => {
+      const nameKey = topic.name.trim().toLowerCase();
+      // "Trigonometry Basics" vs "Trigonometry" check
+      const isDuplicate = seenSlugs.has(topic.slug) || 
+                          seenNames.has(nameKey) ||
+                          seenNames.has(nameKey.replace(" basics", "")) ||
+                          seenNames.has(nameKey + " basics");
+                          
+      if (!isDuplicate) {
+        finalTopics.push(topic);
+        seenSlugs.add(topic.slug);
+        seenNames.add(nameKey);
+        // Also register its subtopics so custom topics don't duplicate built-in subtopics
+        topic.subtopics.forEach(sub => {
+          seenNames.add(sub.name.trim().toLowerCase());
+        });
+      }
+    };
+
+    // 1. Always keep built-in local topics first
+    localTopics.forEach(tryAddTopic);
+    
+    // 2. Add local storage custom topics if unique
+    localCustomTopics.forEach(tryAddTopic);
+    
+    // 3. Add DB custom topics if unique
+    dbTopics.forEach(tryAddTopic);
+    
+    const allTopics = finalTopics;
 
     setTopics(allTopics);
     setProgress((progData as UserProgress[] | null) ?? []);
